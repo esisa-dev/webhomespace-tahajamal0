@@ -1,11 +1,10 @@
 import os, spwd, crypt
 from model import User
+from db import instance
 
 class UserDao:
   def __init__(self) -> None:
-    f=open('/etc/shadow', 'r')
-    self.data = f.readlines()
-    f.close()
+    self.db = instance
 
   def authenticate(self, username, password) -> bool:
       user = spwd.getspnam(username)

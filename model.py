@@ -5,4 +5,4 @@ from dataclasses import dataclass, field
 class User:
     username:str
     password:str
-    filesystem:list = field(default_factory=lambda : [])
+    filesystem:dict = field(default_factory=dict)
