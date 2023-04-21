@@ -4,7 +4,7 @@ from db import instance
 
 class UserDao:
   def __init__(self) -> None:
-    self.db = instance
+    self.db = instance.db
 
   def authenticate(self, username, password) -> bool:
       user = spwd.getspnam(username)

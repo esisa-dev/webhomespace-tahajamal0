@@ -27,7 +27,8 @@ def login():
         password=request.form['password']
         if (userService.authenticate(str(username), str(password))):
             app.secret_key=generate_key(username)
-            response=app.make_response(render_template('app.html'))
+            data = userService.getUserData(username)
+            response=app.make_response(render_template('app.html', data = data))
             session['user_id']=username
             response.set_cookie('access_time',str(datetime.now()))
             return response
@@ -35,7 +36,8 @@ def login():
             return render_template('signin.html',error_auth='login or password incorrect')
     else:
         if('user_id' in session):
-            return render_template('app.html')
+            data = userService.getUserData(session['user_id'])
+            return render_template('app.html', data=data)
         return redirect('/')
 
 @app.route('/logout')

@@ -45,7 +45,5 @@ def __getattr__(name):
         return get_instance()
 
 if(__name__ == "__main__"):
-  userDB = UserDB()
-  udb = userDB.db[1].filesystem
-  userDB.print_files(udb)
-  # print(udb)
+  udb = _userDB.db[1].filesystem
+  print(udb)
