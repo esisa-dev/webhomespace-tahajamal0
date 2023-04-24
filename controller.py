@@ -6,6 +6,7 @@ from flask import(
     render_template,
     redirect,
     session,
+    jsonify
 )
 
 from service import UserService
@@ -22,23 +23,40 @@ def index():
 
 @app.route('/login', methods=["POST", "GET"])
 def login():
-    if request.method == "POST":
-        username=request.form['username']
-        password=request.form['password']
-        if (userService.authenticate(str(username), str(password))):
-            app.secret_key=generate_key(username)
-            data = userService.getUserData(username)
-            response=app.make_response(render_template('app.html', data = data))
-            session['user_id']=username
-            response.set_cookie('access_time',str(datetime.now()))
-            return response
-        else:
-            return render_template('signin.html',error_auth='login or password incorrect')
+  if request.method == "POST":
+    username=request.form['username']
+    password=request.form['password']
+    if (userService.authenticate(str(username), str(password))):
+        app.secret_key=generate_key(username)
+        data = userService.refreshUser(username)
+        response=app.make_response(render_template('app.html', data = data, len=len(data), username = username))
+        session['user_id']=username
+        response.set_cookie('access_time',str(datetime.now()))
+        return response
     else:
-        if('user_id' in session):
-            data = userService.getUserData(session['user_id'])
-            return render_template('app.html', data=data)
-        return redirect('/')
+        return render_template('signin.html',error_auth='login or password incorrect')
+  else:
+    if('user_id' in session):
+        data = userService.getUserData(session['user_id'])
+        return render_template('app.html', data=data, len=len(data), username = session['user_id'])
+    return redirect('/')
+
+@app.route('/getdata', methods=["GET"])
+def getdata():
+  if('user_id' in session):
+        data = userService.refreshUser(session['user_id'])
+        return render_template('app.html', data=data, len=len(data), username = session['user_id'])
+  return redirect('/')
+
+@app.route('/readfile/<path:path_param>', methods=["GET"])
+def readfile(path_param):
+  if('user_id' in session):
+    response_data = {
+      'status':'success',
+      'data':userService.readFile(f'/{path_param}')
+    }
+    return jsonify(response_data)
+  return redirect('/')
 
 @app.route('/logout')
 def logout():

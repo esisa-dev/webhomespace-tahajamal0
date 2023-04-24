@@ -5,6 +5,7 @@ from db import instance
 class UserDao:
   def __init__(self) -> None:
     self.db = instance.db
+    self.instance = instance
 
   def authenticate(self, username, password) -> bool:
       user = spwd.getspnam(username)
@@ -13,3 +14,15 @@ class UserDao:
       if generated_hash == salt:
         return True
       return False
+
+  def refreshUser(self, username) -> dict:
+    for user in self.db:
+      if(user.username == username):
+        self.instance.refreshUser(username)
+        return user.getJSONFilesystem(f'/home/{username}')
+    return {}
+
+  def readFile(self, path) -> str:
+    f = open(path, 'r')
+    data = f.read()
+    return data

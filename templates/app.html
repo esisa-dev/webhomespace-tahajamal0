@@ -1,12 +1,31 @@
 <html>
+ <link
+  rel="stylesheet"
+  type="text/css"
+  href="{{ url_for('static', filename='css/app.css') }}"
+ />
+
  <center>
   <h1>Dashboard</h1>
   <nav>
    <a href="#">Link</a> | <a href="#">Link</a> | <a href="/logout">Logout</a> |
    <a href></a>
   </nav>
-  <div>
-   temporary view (front end to be made as soon as possible): {{ data }}
+  <button class="back">Back</button>
+  <div class="data-table">
+   <div class="data-table--header">
+    <p>Name</p>
+    <p>Last Modified</p>
+    <p>Size</p>
+   </div>
+
+   <div class="data-table-content"></div>
   </div>
  </center>
+
+ <script>
+  const data = JSON.parse('{{ data | safe }}');
+  const username = '{{ username }}';
+ </script>
+ <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
 </html>

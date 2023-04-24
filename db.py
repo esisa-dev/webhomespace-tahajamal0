@@ -1,4 +1,5 @@
-import spwd, os
+import datetime
+import spwd, os, json
 from model import User
 
 class UserDB:
@@ -7,11 +8,20 @@ class UserDB:
     for entry in spwd.getspall():
       if(len(entry.sp_pwdp) > 2):
         self._db.append(User(entry.sp_namp, entry.sp_pwdp))
+    self._initDB()
+
+  def _initDB(self):
     if(self._db):
       for user in self._db:
         home = f'/home/{user.username}'
         user.filesystem.update( { home:{} } )
         self.__crawl(home, user.filesystem[home])
+
+  def __initUser(self, user:User):
+    if(self._db):
+      home = f'/home/{user.username}'
+      user.filesystem.update( { home:{} } )
+      self.__crawl(home, user.filesystem[home])
 
   @property
   def db(self):
@@ -19,21 +29,23 @@ class UserDB:
 
   def __crawl(self, directory, dict):
     for data in os.listdir(directory):
-      if (os.path.isfile(os.path.join(directory, data))):
-        if(data.split('.')[1] == 'txt'):
-          dict[data] = 'txt'
-        else: dict[data] = 'file'
-      elif (os.path.isdir(os.path.join(directory, data))):
-        dict[data] = {}
-        self.__crawl(os.path.join(directory, data), dict[data])
-
-  def print_files(self, curr_dict, indent=''):
-    for key, value in curr_dict.items():
-        if isinstance(value, dict):
-            print(indent + key + '/')
-            self.print_files(value, indent + '    ')
-        else:
-            print(indent + key)
+      path = os.path.join(directory, data)
+      mtime = datetime.datetime.fromtimestamp(os.path.getmtime(path)).strftime("%d %b %Y, %H:%M")
+      size = os.path.getsize(path)
+      if (os.path.isfile(path)):
+        if(data.split('.')[1] == "txt"):
+          dict[data] = {"type":"txt", "mtime":mtime, "size":size}
+        else: dict[data] = {"type":"file", "mtime":mtime, "size":size}
+      elif (os.path.isdir(path)):
+        dict[data] = {"type":"dir", "mtime": mtime, "size": size, "data":{}}
+        self.__crawl(os.path.join(directory, data), dict[data]["data"])
+    
+  def refreshUser(self, username):
+    for user in self._db:
+      if(user.username == username):
+        user.filesystem = {}
+        self.__initUser(user)
+        print(user.filesystem)
     
 _userDB = UserDB()
 
@@ -45,5 +57,4 @@ def __getattr__(name):
         return get_instance()
 
 if(__name__ == "__main__"):
-  udb = _userDB.db[1].filesystem
-  print(udb)
+  _userDB.refreshUser('test')
