@@ -5,6 +5,17 @@
  font-family: sans-serif;
 }
 
+body {
+ width: 800px;
+ margin: 20px auto;
+}
+
+h1 {
+ text-align: center;
+ margin-bottom: 35px;
+ color: #1d4ed8;
+}
+
 .data-table {
  width: 800px;
  height: 500px;
@@ -71,4 +82,95 @@
 
 .txt .name {
  color: #a16207;
+}
+
+nav {
+ display: flex;
+ justify-content: space-between;
+ gap: 10px;
+ align-items: center;
+ margin-bottom: 25px;
+}
+
+nav a,
+.files,
+.dirs,
+.space,
+.back {
+ cursor: pointer;
+ text-decoration: none;
+ padding: 6px 12px;
+ border-radius: 4px;
+}
+
+.files {
+ background-color: #fbbf24;
+ color: #fffbeb;
+}
+
+.dirs {
+ background-color: #16a34a;
+ color: #dcfce7;
+}
+
+.space {
+ background-color: #be123c;
+ color: #ffe4e6;
+}
+
+nav a {
+ background-color: #1d4ed8;
+ color: #fff;
+}
+
+.fds {
+ display: flex;
+ gap: 10px;
+}
+
+.back {
+ border: none;
+ background-color: #1d4ed8;
+ color: #fff;
+}
+
+.search {
+ margin-bottom: 10px;
+}
+
+.search-txtbox {
+ padding: 5px;
+ text-decoration: none;
+ border: 2px solid #1d4ed8;
+ border-radius: 4px;
+}
+
+.btn-search,
+.zip {
+ cursor: pointer;
+ border: none;
+ background-color: transparent;
+ color: #1d4ed8;
+ font-size: 18px;
+ transition: all 0.3s;
+}
+
+.btn-search:hover {
+ margin-left: 6px;
+}
+
+.searchbar-zip {
+ display: flex;
+ justify-content: space-between;
+}
+
+.zip {
+ text-decoration: none;
+ height: 32px;
+ width: 32px;
+ background-color: #1d4ed8;
+ color: #fff;
+ text-align: center;
+ padding: 4px;
+ border-radius: 4px;
 }

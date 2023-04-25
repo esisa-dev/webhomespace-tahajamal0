@@ -2,13 +2,21 @@
 
 const state = {
  oldKey: [],
- oldData: [],
+ oldData: [data],
  data,
  username,
+ depth: 0,
 };
 
 const table = document.querySelector('.data-table');
 const tableContent = document.querySelector('.data-table-content');
+
+function formatBytes(bytes) {
+ const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+ if (bytes === 0) return '0 Bytes';
+ const i = Math.floor(Math.log(bytes) / Math.log(1024));
+ return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+}
 
 const loadData = function (old = false) {
  let current;
@@ -20,7 +28,6 @@ const loadData = function (old = false) {
   current = state.oldData.pop();
   state.data = current;
  }
-
  tableContent.innerHTML = '';
  let markup = '';
  Object.keys(current).forEach((key) => {
@@ -30,15 +37,21 @@ const loadData = function (old = false) {
     type = 'txt';
    }
   }
-  markup += `
+  if (current[key].mtime)
+   markup += `
     <div class="data-table--item ${type}" data-type="${type}">
       <p class="name">${key}</p>
       <p>${current[key].mtime}</p>
-      <p>${current[key].size}</p>
+      <p>${formatBytes(current[key].size)}</p>
     </div>
   `;
  });
  tableContent.insertAdjacentHTML('beforeend', markup);
+ document.querySelector('.nbFiles').innerHTML = current['_nbFiles_'];
+ document.querySelector('.nbDirs').innerHTML = current['_nbDirs_'];
+ document.querySelector('.totalSize').innerHTML = formatBytes(
+  current['_totalSize_']
+ );
 };
 
 window.addEventListener('load', loadData);
@@ -48,23 +61,82 @@ tableContent.addEventListener('click', async function (e) {
  if (item) {
   const key = item.firstElementChild.innerHTML;
   if (item.dataset.type === 'dir') {
+   state.depth += 1;
    state.oldData.push(state.data);
    state.oldKey.push(key);
    state.data = state.data[key]['data'];
    loadData(key);
   } else if (item.dataset.type === 'txt') {
-   console.log();
-   const path_param =
-    state.oldKey.length === 0
-     ? `/readfile/home/${state.username}/${key}`
-     : `/readfile/home/${state.username}/${state.oldKey.join('/')}/${key}`;
-   const res = await fetch(path_param);
+   const res = await fetch(`/search/${key}`);
    const data = await res.json();
-   console.log(data.data);
+   console.log(data.data[state.depth]);
+   //  const path_param =
+   //   state.oldKey.length === 0
+   //    ? `/readfile/home/${state.username}/${key}`
+   //    : `/readfile/home/${state.username}/${state.oldKey.join('/')}/${key}`;
+   //  const res = await fetch(path_param);
+   //  const data = await res.json();
+   //  console.log(data.data);
   }
  }
 });
 
 document.querySelector('.back').addEventListener('click', (e) => {
- loadData(false);
+ if (state.searched) {
+  state.data = data;
+  state.oldData = [data];
+  state.searched = false;
+  document.getElementById('searchbox').value = '';
+  dispatchEvent(new Event('load'));
+ } else {
+  document.getElementById('searchbox').value = '';
+  loadData(false);
+ }
+});
+
+window.addEventListener('keydown', function (event) {
+ if (event.key === 'ArrowLeft') {
+  document.querySelector('.back').click();
+ }
+});
+
+document
+ .querySelector('.btn-search')
+ .addEventListener('click', async function (e) {
+  e.preventDefault();
+  const keyword = document.getElementById('searchbox').value;
+  if (!keyword) {
+   dispatchEvent(new Event('load'));
+   return;
+  }
+  const res = await fetch(`/search/${keyword}`);
+  const data = await res.json();
+  if (!data) return;
+  state.searched = true;
+  let markup = '';
+  tableContent.innerHTML = '';
+  data.data.forEach((current) => {
+   let type = current[1].type === 'dir' ? 'dir' : 'file';
+   if (type === 'file') {
+    if (current[1].type === 'txt') {
+     type = 'txt';
+    }
+   }
+   if (current[1].mtime)
+    markup += `
+    <div class="data-table--item ${type}" data-type="${type}">
+      <p class="name">${current[0]}</p>
+      <p>${current[1].mtime}</p>
+      <p>${formatBytes(current[1].size)}</p>
+    </div>
+  `;
+  });
+  tableContent.insertAdjacentHTML('beforeend', markup);
+  document.querySelector('.nbFiles').innerHTML = '';
+  document.querySelector('.nbDirs').innerHTML = '';
+  document.querySelector('.totalSize').innerHTML = '';
+ });
+
+document.getElementById('searchbox').addEventListener('input', (e) => {
+ document.querySelector('.btn-search').click();
 });

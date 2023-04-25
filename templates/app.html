@@ -1,17 +1,44 @@
-<html>
- <link
-  rel="stylesheet"
-  type="text/css"
-  href="{{ url_for('static', filename='css/app.css') }}"
- />
-
- <center>
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+   rel="stylesheet"
+   type="text/css"
+   href="{{ url_for('static', filename='css/app.css') }}"
+  />
+  <title>Dashboard</title>
+ </head>
+ <body>
   <h1>Dashboard</h1>
   <nav>
-   <a href="#">Link</a> | <a href="#">Link</a> | <a href="/logout">Logout</a> |
-   <a href></a>
+   <button class="back">&larr; Back</button>
+
+   <div class="fds">
+    <p class="files">Files : <span class="nbFiles"></span></p>
+    <p class="dirs">Dirs : <span class="nbDirs"></span></p>
+    <p class="space">Space : <span class="totalSize"></span></p>
+   </div>
+
+   <a href="/logout" style="font-size: 14px">Logout &rarr;</a>
   </nav>
-  <button class="back">Back</button>
+
+  <div class="searchbar-zip">
+   <div class="search">
+    <input
+     type="text"
+     placeholder="Search..."
+     name="search"
+     class="search-txtbox"
+     id="searchbox"
+    />
+    <button class="btn-search">&rarr;</button>
+   </div>
+   <a href="/makearchive" class="zip">&downarrow;</a>
+  </div>
+
   <div class="data-table">
    <div class="data-table--header">
     <p>Name</p>
@@ -21,11 +48,11 @@
 
    <div class="data-table-content"></div>
   </div>
- </center>
 
- <script>
-  const data = JSON.parse('{{ data | safe }}');
-  const username = '{{ username }}';
- </script>
- <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script>
+   const data = JSON.parse('{{ data | safe }}');
+   const username = '{{ username }}';
+  </script>
+  <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+ </body>
 </html>
