@@ -1,4 +1,40 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+   rel="stylesheet"
+   type="text/css"
+   href="{{ url_for('static', filename='css/signin.css') }}"
+  />
+  <title>Login</title>
+ </head>
+ <body>
+  <form action="/login" method="post">
+   <h3>Login</h3>
+   <input
+    class="login-input"
+    type="text"
+    name="username"
+    placeholder="Username"
+    required
+   />
+   <input
+    class="login-input"
+    type="password"
+    name="password"
+    placeholder="Password"
+    required
+   />
+   <input class="submit-input" type="submit" value="Authenticate" />
+  </form>
+  <p>{{error_auth}}</p>
+ </body>
+</html>
+
+<!-- <html>
  <center>
   <h3 style="color: blue">Login</h3>
   <form action="/login" method="post">
@@ -20,4 +56,4 @@
   </form>
   <p style="color: red">{{error_auth}}</p>
  </center>
-</html>
+</html> -->
