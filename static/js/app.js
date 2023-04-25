@@ -59,6 +59,7 @@ window.addEventListener('load', loadData);
 tableContent.addEventListener('click', async function (e) {
  const item = e.target.closest('div');
  if (item) {
+  const firstChild = item.firstElementChild;
   const key = item.firstElementChild.innerHTML;
   if (item.dataset.type === 'dir') {
    state.depth += 1;
@@ -69,19 +70,30 @@ tableContent.addEventListener('click', async function (e) {
   } else if (item.dataset.type === 'txt') {
    const res = await fetch(`/search/${key}`);
    const data = await res.json();
-   console.log(data.data[state.depth]);
-   //  const path_param =
-   //   state.oldKey.length === 0
-   //    ? `/readfile/home/${state.username}/${key}`
-   //    : `/readfile/home/${state.username}/${state.oldKey.join('/')}/${key}`;
-   //  const res = await fetch(path_param);
-   //  const data = await res.json();
-   //  console.log(data.data);
+   let currDepth;
+   if (!state.searched) console.log(data.data[state.depth][1]['content']);
+   else {
+    let allFiles = Array.from(document.querySelectorAll('.name'));
+    let selectedSameFiles = [];
+    for (let i = 0; i < allFiles.length; i++) {
+     if (firstChild.innerHTML === allFiles[i].innerHTML) {
+      selectedSameFiles.push(allFiles[i]);
+     }
+    }
+
+    for (let i = 0; i < selectedSameFiles.length; i++) {
+     if (firstChild === selectedSameFiles[i]) {
+      currDepth = i;
+     }
+    }
+    console.log(data.data[currDepth][1]['content']);
+   }
   }
  }
 });
 
 document.querySelector('.back').addEventListener('click', (e) => {
+ state.depth = state.depth === 0 ? 0 : state.depth - 1;
  if (state.searched) {
   state.data = data;
   state.oldData = [data];
